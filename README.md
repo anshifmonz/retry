@@ -381,14 +381,14 @@ Fast failure, better UX
 
 | Feature                  | This Library | p-retry | axios-retry | ts-retry |
 | ------------------------ | ------------ | ------- | ----------- | -------- |
-| Per-attempt timeouts     | ✅           | ❌      | ❌          | ❌       |
-| Dual abort control       | ✅           | ❌      | ❌          | ❌       |
-| Full error history       | ✅           | ❌      | ❌          | ❌       |
-| Retry on falsy results   | ✅           | ❌      | ❌          | ❌       |
-| Custom jitter strategies | ✅           | ✅      | ❌          | ❌       |
-| Lifecycle hooks          | ✅           | ✅      | ✅          | ❌       |
-| Zero dependencies        | ✅           | ❌      | ❌          | ✅       |
-| TypeScript-first         | ✅           | ✅      | ❌          | ✅       |
+| Per-attempt timeouts     | ✅ Superior  | ❌      | ⚠️ Partial  | ❌       |
+| Dual abort control       | ✅ Superior  | ✅      | ❌          | ❌       |
+| Full error history       | ✅ Unique    | ❌      | ❌          | ❌       |
+| Retry on falsy results   | ✅ Enhanced  | ❌      | ❌          | ✅       |
+| Custom jitter strategies | ✅ Built-in  | ✅      | ✅          | ✅       |
+| Lifecycle hooks          | ✅ Rich      | ✅      | ✅          | ✅       |
+| Zero dependencies        | ✅           | ✅      | ✅          | ✅       |
+| TypeScript-first         | ✅ Native    | ✅      | ✅          | ✅       |
 
 ## Best Practices
 
