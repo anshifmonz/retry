@@ -1,0 +1,9 @@
+.history/
+.github/
+node_modules/
+*.test.*
+tsconfig.*
+*.tsbuildinfo
+Code
+.vscode
+dist/
