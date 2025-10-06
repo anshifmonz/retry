@@ -1,35 +1,30 @@
 {
   "name": "@anshifmonz/retry",
   "version": "1.0.0",
-  "description": "A production-grade retry utility with per-attempt timeouts, dual abort control, and rich error context",
-  "main": "dist/retry.js",
-  "module": "dist/retry.mjs",
-  "types": "dist/retry.d.ts",
+  "description": "A production-grade retry utility with per-attempt timeouts, dual abort control, and rich error context.",
+  "main": "./dist/cjs/retry.js",
+  "module": "./dist/esm/retry.mjs",
+  "types": "./dist/types/retry.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/retry.mjs",
-      "require": "./dist/retry.js",
-      "types": "./dist/retry.d.ts"
+      "require": "./dist/cjs/retry.js",
+      "import": "./dist/esm/retry.mjs",
+      "types": "./dist/types/retry.d.ts"
     }
   },
   "files": [
     "dist",
-    "src",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
-    "build:cjs": "tsc --module commonjs --outDir dist --declaration false",
-    "build:esm": "tsc --module esnext --outDir dist --declaration false --outFile dist/retry.mjs",
-    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc --build tsconfig.cjs.json tsconfig.esm.json tsconfig.types.json",
     "test": "tsx retry.test.ts",
     "test:watch": "tsx --watch retry.test.ts",
     "test:coverage": "c8 tsx retry.test.ts",
-    "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,md,json}\"",
-    "prepublishOnly": "npm run build && npm test",
-    "clean": "rm -rf dist"
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "retry",
@@ -47,7 +42,7 @@
     "promise"
   ],
   "author": {
-    "name": "Anshif Monz",
+    "name": "Muhammed Anshif",
     "url": "https://github.com/anshifmonz"
   },
   "license": "MIT",
