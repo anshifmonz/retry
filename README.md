@@ -2,6 +2,8 @@
 
 A production-grade retry utility with per-attempt timeouts, dual abort control, and rich error context.
 
+[![CI](https://github.com/anshifmonz/retry/actions/workflows/ci.yml/badge.svg)](https://github.com/anshifmonz/retry/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/%40anshifmonz%2Fretry.svg)](https://www.npmjs.com/package/@anshifmonz/retry)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](./retry.test.ts)
@@ -39,19 +41,18 @@ git clone https://github.com/anshifmonz/retry.git
 ## Quick Start
 
 ```typescript
-import retry from "./retry";
+import retry from './retry';
 
 // Basic usage
-const result = await retry(
-  () => fetch("https://api.example.com").then((r) => r.json()),
-  { retries: 3 }
-);
+const result = await retry(() => fetch('https://api.example.com').then(r => r.json()), {
+  retries: 3
+});
 
 if (result.data) {
-  console.log("Success:", result.data);
+  console.log('Success:', result.data);
 } else {
-  console.error("Failed after", result.attempts, "attempts");
-  console.error("Errors:", result.errors);
+  console.error('Failed after', result.attempts, 'attempts');
+  console.error('Errors:', result.errors);
 }
 ```
 
@@ -62,13 +63,10 @@ if (result.data) {
 Kill slow attempts instead of waiting forever:
 
 ```typescript
-const result = await retry(
-  (attempt, signal) => fetch(paymentAPI, { signal }).then((r) => r.json()),
-  {
-    retries: 3,
-    attemptTimeout: 5000, // Each attempt gets max 5s
-  }
-);
+const result = await retry((attempt, signal) => fetch(paymentAPI, { signal }).then(r => r.json()), {
+  retries: 3,
+  attemptTimeout: 5000 // Each attempt gets max 5s
+});
 
 // If an attempt hangs, it's killed after 5s and moves to the next retry
 // Total max time: ~15s, not 90s+
@@ -83,11 +81,11 @@ Only retry specific errors:
 ```typescript
 const result = await retry(() => apiCall(), {
   retries: 5,
-  shouldRetry: (error) => {
+  shouldRetry: error => {
     // Only retry 5xx server errors, skip 4xx client errors
     const status = error?.statusCode || error?.status;
     return status >= 500 && status < 600;
-  },
+  }
 });
 ```
 
@@ -98,13 +96,13 @@ Handle APIs that return `null` instead of throwing:
 ```typescript
 const result = await retry(() => getUserData(), {
   retries: 3,
-  retryOnFalsy: true, // Retry if result is null/undefined
+  retryOnFalsy: true // Retry if result is null/undefined
 });
 
 // Or with custom predicate
 const result = await retry(() => getProducts(), {
   retries: 3,
-  retryOnFalsy: (value) => Array.isArray(value) && value.length === 0,
+  retryOnFalsy: value => Array.isArray(value) && value.length === 0
 });
 ```
 
@@ -115,13 +113,10 @@ Cancel the entire retry operation:
 ```typescript
 const controller = new AbortController();
 
-const result = await retry(
-  (attempt, signal) => fetch(url, { signal }).then((r) => r.json()),
-  {
-    retries: 5,
-    signal: controller.signal,
-  }
-);
+const result = await retry((attempt, signal) => fetch(url, { signal }).then(r => r.json()), {
+  retries: 5,
+  signal: controller.signal
+});
 
 // Cancel from elsewhere
 setTimeout(() => controller.abort(), 10000);
@@ -136,11 +131,11 @@ const result = await retry(() => apiCall(), {
   retries: 3,
   onRetry: (attempt, error, delay) => {
     logger.warn(`Retry attempt ${attempt} after ${delay}ms`, {
-      error: error.message,
+      error: error.message
     });
 
-    metrics.increment("api.retry", { attempt });
-  },
+    metrics.increment('api.retry', { attempt });
+  }
 });
 ```
 
@@ -153,15 +148,15 @@ const result = await retry(() => apiCall(), { retries: 3 });
 
 if (result.errors) {
   // Log all errors to your error tracking service
-  Sentry.captureException(new Error("API failed"), {
+  Sentry.captureException(new Error('API failed'), {
     extra: {
       attempts: result.attempts,
-      allErrors: result.errors.map((e) => ({
+      allErrors: result.errors.map(e => ({
         name: e.name,
         message: e.message,
-        statusCode: e.statusCode,
-      })),
-    },
+        statusCode: e.statusCode
+      }))
+    }
   });
 }
 ```
@@ -175,7 +170,7 @@ const result = await retry(() => apiCall(), {
   retries: 5,
   delay: 500, // Base delay
   maxDelay: 10000, // Cap at 10s
-  jitter: "full", // 'none' | 'full' | 'equal'
+  jitter: 'full' // 'none' | 'full' | 'equal'
 });
 
 // Delays grow: ~500ms, ~1s, ~2s, ~4s, ~8s (with random jitter)
@@ -238,15 +233,15 @@ Promise<RetryPromiseResult<T, E>>
 
 ```typescript
 class AbortError extends Error {
-  name: "AbortError";
+  name: 'AbortError';
 }
 
 class TimeoutError extends Error {
-  name: "TimeoutError";
+  name: 'TimeoutError';
 }
 
 class FalsyResultError extends Error {
-  name: "FalsyResultError";
+  name: 'FalsyResultError';
 }
 ```
 
@@ -259,19 +254,19 @@ async function processPayment(orderId: string) {
   const result = await retry(
     (attempt, signal) =>
       fetch(`/api/payments/${orderId}`, {
-        method: "POST",
-        signal,
-      }).then((r) => r.json()),
+        method: 'POST',
+        signal
+      }).then(r => r.json()),
     {
       retries: 3,
       attemptTimeout: 5000,
-      shouldRetry: (error) => {
+      shouldRetry: error => {
         // Retry on network errors and 5xx
         return !error.statusCode || error.statusCode >= 500;
       },
       onRetry: (attempt, error, delay) => {
-        logger.warn("Payment retry", { orderId, attempt, error });
-      },
+        logger.warn('Payment retry', { orderId, attempt, error });
+      }
     }
   );
 
@@ -291,10 +286,10 @@ async function getUserWithRetry(userId: string) {
     retries: 3,
     retryOnFalsy: true, // Retry if user not found
     delay: 200,
-    jitter: "equal",
+    jitter: 'equal'
   });
 
-  return result.data || { id: userId, name: "Guest" };
+  return result.data || { id: userId, name: 'Guest' };
 }
 ```
 
@@ -309,19 +304,18 @@ async function callService(endpoint: string) {
 
   try {
     const result = await retry(
-      (attempt, signal) =>
-        fetch(`http://service/${endpoint}`, { signal }).then((r) => r.json()),
+      (attempt, signal) => fetch(`http://service/${endpoint}`, { signal }).then(r => r.json()),
       {
         retries: 5,
         attemptTimeout: 5000,
         signal: controller.signal,
-        shouldRetry: (error) => {
+        shouldRetry: error => {
           // Don't retry on auth errors
           if (error.statusCode === 401 || error.statusCode === 403) {
             return false;
           }
           return error.statusCode >= 500;
-        },
+        }
       }
     );
 
@@ -409,7 +403,7 @@ retry(() => fetch(url), options);
 Don't retry client errors (4xx):
 
 ```typescript
-shouldRetry: (error) => {
+shouldRetry: error => {
   const status = error?.statusCode;
   // Only retry server errors and network failures
   return !status || status >= 500;
@@ -434,11 +428,11 @@ Use lifecycle hooks to monitor retry behavior:
 
 ```typescript
 onRetry: (attempt, error, delay) => {
-  logger.warn("API retry", {
+  logger.warn('API retry', {
     attempt,
     error: error.message,
     delay,
-    timestamp: Date.now(),
+    timestamp: Date.now()
   });
 };
 ```
@@ -466,7 +460,7 @@ onRetry: (attempt, error, delay) => {
 **A:** Use custom `shouldRetry` logic:
 
 ```typescript
-shouldRetry: (error) => {
+shouldRetry: error => {
   if (error instanceof NetworkError) return true;
   if (error instanceof AuthError) return false;
   return error.statusCode >= 500;

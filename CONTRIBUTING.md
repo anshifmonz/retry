@@ -21,6 +21,7 @@ The following is a set of guidelines for contributing to this project. These are
 This project and everyone participating in it is governed by basic principles of respect and professionalism. By participating, you are expected to uphold this code.
 
 **Be respectful:**
+
 - Use welcoming and inclusive language
 - Be respectful of differing viewpoints and experiences
 - Gracefully accept constructive criticism
@@ -36,12 +37,13 @@ When creating a bug report, include as many details as possible:
 
 **Bug Report Template:**
 
-```markdown
+````markdown
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Call retry with options '...'
 2. API fails with '...'
 3. See error
@@ -53,22 +55,23 @@ What you expected to happen.
 What actually happened.
 
 **Code sample**
+
 ```typescript
 // Minimal reproducible example
-const result = await retry(
-  () => fetch('...'),
-  { retries: 3 }
-);
+const result = await retry(() => fetch('...'), { retries: 3 });
 ```
+````
 
 **Environment:**
+
 - Node.js version: [e.g. 18.0.0]
 - TypeScript version: [e.g. 5.0.0]
 - OS: [e.g. macOS, Ubuntu]
 
 **Additional context**
 Any other context about the problem.
-```
+
+````
 
 ### Suggesting Features
 
@@ -95,7 +98,7 @@ How would you use this feature? Provide a code example if possible.
 
 **Additional context**
 Any other context or screenshots about the feature request.
-```
+````
 
 ### Pull Requests
 
@@ -107,12 +110,14 @@ Any other context or screenshots about the feature request.
 6. **Submit a pull request** with a clear description
 
 **Good PR titles:**
+
 - ✅ `feat: Add support for custom backoff strategies`
 - ✅ `fix: Handle edge case when signal is already aborted`
 - ✅ `docs: Clarify attemptTimeout behavior`
 - ✅ `test: Add tests for retry on empty arrays`
 
 **Bad PR titles:**
+
 - ❌ `Update retry.ts`
 - ❌ `Fix bug`
 - ❌ `Changes`
@@ -120,12 +125,14 @@ Any other context or screenshots about the feature request.
 ## Development Setup
 
 1. **Clone your fork:**
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/retry.git
 cd retry
 ```
 
 2. **Install dependencies:**
+
 ```bash
 npm install
 # or
@@ -133,6 +140,7 @@ yarn install
 ```
 
 3. **Run tests:**
+
 ```bash
 npm test
 ```
@@ -164,7 +172,7 @@ console.log('Test: Should retry on 5xx errors');
 const api = createStatusCodeAPI([503, 500, 200]);
 const result = await retry(() => api(), {
   retries: 3,
-  shouldRetry: (error) => error.statusCode >= 500
+  shouldRetry: error => error.statusCode >= 500
 });
 // Assert expected behavior
 
@@ -205,7 +213,7 @@ export async function retry<T, E extends Error = Error>(
 }
 
 // ❌ Bad - inconsistent spacing, unclear types
-export async function retry(fn:any,options?:any){
+export async function retry(fn: any, options?: any) {
   // Implementation
 }
 ```
@@ -222,7 +230,7 @@ export async function retry(fn:any,options?:any){
 interface RetryOptions<E> {
   /** Maximum number of retry attempts */
   retries?: number;
-  
+
   /** Base delay between retries in milliseconds */
   delay?: number;
 }
@@ -306,6 +314,7 @@ Before submitting, ensure:
 ## Questions?
 
 Feel free to:
+
 - Open an issue with the `question` label
 - Start a discussion in GitHub Discussions
 - Reach out on [LinkedIn](https://linkedin.com/in/anshifmonz)
@@ -313,6 +322,7 @@ Feel free to:
 ## Recognition
 
 Contributors will be recognized in:
+
 - The project README
 - Release notes for significant contributions
 - GitHub's contributors page
