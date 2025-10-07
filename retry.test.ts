@@ -10,7 +10,7 @@ function createFlakyAPI(failCount: number, delayMs: number = 100) {
     await new Promise(resolve => setTimeout(resolve, delayMs));
 
     if (attempts <= failCount) {
-      const error: any = new Error(`API failed (attempt ${attempts})`);
+      const error = new Error(`API failed (attempt ${attempts})`) as Error & { statusCode: number };
       error.statusCode = 503; // Service unavailable
       throw error;
     }
@@ -21,8 +21,8 @@ function createFlakyAPI(failCount: number, delayMs: number = 100) {
 
 // Simulates an API that always times out (hangs forever)
 function createSlowAPI(delayMs: number = 10000) {
-  return async (signal?: AbortSignal) => {
-    return new Promise((resolve, reject) => {
+  return (signal?: AbortSignal) =>
+    new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         resolve({ data: 'Finally responded' });
       }, delayMs);
@@ -32,7 +32,6 @@ function createSlowAPI(delayMs: number = 10000) {
         reject(new Error('Aborted by signal'));
       });
     });
-  };
 }
 
 // Simulates an API that returns null/undefined on soft failures
@@ -58,7 +57,7 @@ function createStatusCodeAPI(statusCodes: number[]) {
     await new Promise(resolve => setTimeout(resolve, 50));
 
     if (statusCode >= 400) {
-      const error: any = new Error(`HTTP ${statusCode}`);
+      const error = new Error(`HTTP ${statusCode}`) as Error & { statusCode: number };
       error.statusCode = statusCode;
       throw error;
     }
@@ -73,7 +72,7 @@ function createPaymentAPI(successRate: number = 0.5) {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     if (Math.random() > successRate) {
-      const error: any = new Error('Payment gateway timeout');
+      const error = new Error('Payment gateway timeout') as Error & { statusCode: number };
       error.statusCode = 504;
       throw error;
     }
@@ -86,11 +85,9 @@ function createPaymentAPI(successRate: number = 0.5) {
   };
 }
 
-// Test Suite
-async function runTests() {
-  console.log('🧪 Starting Retry Utility Tests\n');
+// Test Cases
 
-  // Test 1: Basic retry with flaky API
+async function testFlakyAPI(): Promise<void> {
   console.log('Test 1: Flaky API (fails 2 times, succeeds on 3rd)');
   try {
     const flakyAPI = createFlakyAPI(2);
@@ -104,8 +101,9 @@ async function runTests() {
     console.log('❌ Test 1 failed:', error);
   }
   console.log('');
+}
 
-  // Test 2: Per-attempt timeout (kills slow attempts)
+async function testAttemptTimeout(): Promise<void> {
   console.log('Test 2: Per-attempt timeout (5s API with 1s timeout)');
   try {
     const slowAPI = createSlowAPI(5000);
@@ -125,8 +123,9 @@ async function runTests() {
     console.log('❌ Test 2 failed:', error);
   }
   console.log('');
+}
 
-  // Test 3: Retry on falsy results
+async function testRetryOnFalsy(): Promise<void> {
   console.log('Test 3: Retry on null/undefined results');
   try {
     const softFailAPI = createSoftFailureAPI(2);
@@ -144,16 +143,17 @@ async function runTests() {
     console.log('❌ Test 3 failed:', error);
   }
   console.log('');
+}
 
-  // Test 4: Custom retry logic (only retry 5xx, not 4xx)
+async function testCustomRetryLogic(): Promise<void> {
   console.log('Test 4: Custom retry logic (retry 5xx, skip 4xx)');
   try {
     const statusAPI = createStatusCodeAPI([503, 500, 404]); // 5xx, 5xx, then 4xx
     const result = await retry(() => statusAPI(), {
       retries: 5,
-      shouldRetry: (error: any) => {
-        const status = error?.statusCode;
-        return status >= 500 && status < 600; // Only retry 5xx
+      shouldRetry: (error: unknown) => {
+        const status = (error as { statusCode?: number })?.statusCode;
+        return typeof status === 'number' && status >= 500 && status < 600; // Only retry 5xx
       },
       delay: 50
     });
@@ -167,8 +167,9 @@ async function runTests() {
     console.log('❌ Test 4 failed:', error);
   }
   console.log('');
+}
 
-  // Test 5: Exponential backoff with jitter
+async function testExponentialBackoff(): Promise<void> {
   console.log('Test 5: Exponential backoff timing');
   try {
     const flakyAPI = createFlakyAPI(3);
@@ -192,8 +193,9 @@ async function runTests() {
     console.log('❌ Test 5 failed:', error);
   }
   console.log('');
+}
 
-  // Test 6: Global abort signal
+async function testGlobalAbort(): Promise<void> {
   console.log('Test 6: Global abort with AbortController');
   try {
     const controller = new AbortController();
@@ -211,7 +213,7 @@ async function runTests() {
       signal: controller.signal
     });
 
-    if (result.errors && result.errors.some(e => e instanceof AbortError)) {
+    if (result.errors?.some(e => e instanceof AbortError)) {
       console.log('✅ Successfully aborted');
       console.log('   Attempts before abort:', result.attempts);
     }
@@ -219,8 +221,9 @@ async function runTests() {
     console.log('❌ Test 6 failed:', error);
   }
   console.log('');
+}
 
-  // Test 7: Full error history
+async function testErrorHistory(): Promise<void> {
   console.log('Test 7: Full error history (all errors, not just last)');
   try {
     const statusAPI = createStatusCodeAPI([503, 500, 502]);
@@ -239,8 +242,9 @@ async function runTests() {
     console.log('❌ Test 7 failed:', error);
   }
   console.log('');
+}
 
-  // Test 8: Payment API simulation (realistic use case)
+async function testPaymentAPI(): Promise<void> {
   console.log('Test 8: Payment API simulation (50% success rate)');
   try {
     const paymentAPI = createPaymentAPI(0.3); // 30% success rate
@@ -248,7 +252,7 @@ async function runTests() {
       retries: 5,
       delay: 200,
       jitter: 'equal',
-      onRetry: (attempt, error) => {
+      onRetry: (attempt, _error) => {
         console.log(`   Payment attempt ${attempt} failed, retrying...`);
       }
     });
@@ -264,12 +268,13 @@ async function runTests() {
     console.log('❌ Test 8 failed:', error);
   }
   console.log('');
+}
 
-  // Test 9: Custom falsy predicate
+async function testCustomFalsyPredicate(): Promise<void> {
   console.log('Test 9: Custom falsy predicate (retry on empty array)');
   try {
     let attempts = 0;
-    const emptyResultAPI = async () => {
+    const emptyResultAPI = async (): Promise<{ id: number; name: string }[]> => {
       attempts++;
       await new Promise(resolve => setTimeout(resolve, 50));
       return attempts <= 2 ? [] : [{ id: 1, name: 'Item' }];
@@ -289,12 +294,13 @@ async function runTests() {
     console.log('❌ Test 9 failed:', error);
   }
   console.log('');
+}
 
-  // Test 10: No retries needed (success on first try)
+async function testSuccessOnFirstAttempt(): Promise<void> {
   console.log('Test 10: Success on first attempt (no retries)');
   try {
-    const goodAPI = async () => ({ status: 'ok', data: 'Success!' });
-    const result = await retry(() => goodAPI(), { retries: 3 });
+    const goodAPI = (): { status: string; data: string } => ({ status: 'ok', data: 'Success!' });
+    const result = await retry(() => Promise.resolve(goodAPI()), { retries: 3 });
 
     if (result.data && result.attempts === 1) {
       console.log('✅ Success on first try (no retries needed)');
@@ -303,9 +309,34 @@ async function runTests() {
   } catch (error) {
     console.log('❌ Test 10 failed:', error);
   }
+  console.log('');
+}
+
+// Test Suite
+async function runTests(): Promise<void> {
+  console.log('🧪 Starting Retry Utility Tests\n');
+
+  await testFlakyAPI();
+  await testAttemptTimeout();
+  await testRetryOnFalsy();
+  await testCustomRetryLogic();
+  await testExponentialBackoff();
+  await testGlobalAbort();
+  await testErrorHistory();
+  await testPaymentAPI();
+  await testCustomFalsyPredicate();
+  await testSuccessOnFirstAttempt();
 
   console.log('\n✨ All tests completed!');
 }
 
 // Run the test suite
-runTests().catch(console.error);
+async function main(): Promise<void> {
+  try {
+    await runTests();
+  } catch (error) {
+    console.error('🛑 Test suite failed:', error);
+  }
+}
+
+void main();
