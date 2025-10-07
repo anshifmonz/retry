@@ -2,8 +2,8 @@
 
 A production-grade retry utility with per-attempt timeouts, dual abort control, and rich error context.
 
-[![CI](https://github.com/anshifmonz/retry/actions/workflows/ci.yml/badge.svg)](https://github.com/anshifmonz/retry/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/%40anshifmonz%2Fretry.svg)](https://www.npmjs.com/package/@anshifmonz/retry)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/anshifmonz/retry/ci.yml?branch=master&style=flat-square&logo=github&color=blue)](https://github.com/anshifmonz/retry/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@anshifmonz/retry?style=flat-square&color=green&logo=npm)](https://www.npmjs.com/package/@anshifmonz/retry)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](./retry.test.ts)
@@ -18,14 +18,14 @@ When an API hangs for 30 seconds and you have 3 retries, you wait 90 seconds bef
 
 ## Features
 
-✅ **Per-attempt timeouts** — Cancel individual slow attempts, not the whole operation
-✅ **Dual abort control** — Cancel globally OR just the current attempt via `AbortController`
-✅ **Full error history** — Get ALL errors from every attempt, not just the last one
-✅ **Custom retry conditions** — Decide what's retryable with sync/async predicates
-✅ **Retry on falsy results** — Handle APIs that return `null`/`undefined` on soft failures
-✅ **Lifecycle hooks** — Run callbacks on each attempt for logging/metrics
-✅ **Exponential backoff** — Smart delays with configurable jitter strategies
-✅ **Zero dependencies** — Lightweight, no external packages
+✅ **Per-attempt timeouts** — Cancel individual slow attempts, not the whole operation  
+✅ **Dual abort control** — Cancel globally OR just the current attempt via `AbortController`  
+✅ **Full error history** — Get ALL errors from every attempt, not just the last one  
+✅ **Custom retry conditions** — Decide what's retryable with sync/async predicates  
+✅ **Retry on falsy results** — Handle APIs that return `null`/`undefined` on soft failures  
+✅ **Lifecycle hooks** — Run callbacks on each attempt for logging/metrics  
+✅ **Exponential backoff** — Smart delays with configurable jitter strategies  
+✅ **Zero dependencies** — Lightweight, no external packages  
 ✅ **Full TypeScript support** — Complete type safety and inference
 
 ## Installation
