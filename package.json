@@ -2,14 +2,14 @@
   "name": "@anshifmonz/retry",
   "version": "1.0.0",
   "description": "A production-grade retry utility with per-attempt timeouts, dual abort control, and rich error context.",
-  "main": "./dist/cjs/retry.js",
-  "module": "./dist/esm/retry.mjs",
-  "types": "./dist/types/retry.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/cjs/retry.js",
-      "import": "./dist/esm/retry.mjs",
-      "types": "./dist/types/retry.d.ts"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "files": [
@@ -20,9 +20,9 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc --build tsconfig.cjs.json tsconfig.esm.json tsconfig.types.json",
-    "test": "tsx retry.test.ts",
-    "test:watch": "tsx --watch retry.test.ts",
-    "test:coverage": "c8 tsx retry.test.ts",
+    "test": "tsx test/index.ts",
+    "test:watch": "tsx --watch test/index.ts",
+    "test:coverage": "c8 tsx test/index.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,md,json}\"",
