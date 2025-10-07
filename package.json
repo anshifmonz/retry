@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
+    "prepare": "husky install",
     "build": "npm run clean && tsc --build tsconfig.cjs.json tsconfig.esm.json tsconfig.types.json",
     "test": "tsx test/index.ts",
     "tsc": "tsc --noEmit -p tsconfig.base.json",
@@ -27,7 +28,14 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"**/*.{ts,md,json}\"",
+    "precommit": "lint-staged && npm run tsc",
     "prepublishOnly": "npm run build && npm test"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "keywords": [
     "retry",
@@ -63,10 +71,13 @@
     "@typescript-eslint/parser": "^8.45.0",
     "c8": "^9.0.0",
     "eslint": "^9.37.0",
+    "globals": "^16.4.0",
     "prettier": "^3.0.0",
     "rimraf": "^6.0.1",
     "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3"
   },
   "engines": {
     "node": ">=18.0.0"
